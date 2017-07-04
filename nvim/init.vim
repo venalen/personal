@@ -9,9 +9,9 @@ silent! if plug#begin('~/.local/share/nvim/plugged')
 
 " searching
 Plug 'ctrlpvim/ctrlp.vim'
-"Plug 'rking/ag.vim'
+Plug 'rking/ag.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
+Plug 'hinshun/fzf.vim'
 
 " movement
 Plug 'lokaltog/vim-easymotion'
@@ -41,16 +41,21 @@ Plug 'sudar/comments.vim'
 " bracket matching
 Plug 'jiangmiao/auto-pairs'
 
+" colours
+Plug 'chriskempson/vim-tomorrow-theme'
+
 call plug#end()
 endif
 
 " ========
 " General
 " ========
-
 set t_Co=256
+" Set line numbers
 set number
+" Line will wrap
 set wrap
+" Auto save when switching buffers
 set autowrite
 " Get access to clipboard
 set clipboard=unnamed
@@ -62,16 +67,16 @@ set splitbelow
 set cursorline
 " Highlight search pattern matches
 set hlsearch
-" Set statusline to show path to file
-set statusline+=%F
 " Always show status line
 set laststatus=2
+" Don't show the --insert-- --visual-- etc footers
+set noshowmode
 " Enable unicode
 set encoding=utf-8
 set backspace=indent,eol,start
-" redraw screen to remove search highlighting
+" Redraw screen to remove search highlighting
 nnoremap <silent> <C-l> :nohl<CR><C-l>
-" no backups
+" No backups
 set nobackup
 set nowritebackup
 set noswapfile
@@ -81,6 +86,14 @@ set scrolloff=5
 silent! colorscheme Tomorrow-Night-Eighties
 " lower the delay of escaping out of other modes
 set timeoutlen=200
+
+" Combination of the setting below prevents the weird duplicate
+" lines caused by the conflict between colorscheme and vim-airline
+" length of time after you stop typing before it triggers the plugin
+set updatetime=700
+" don't update screen during macro/script execution
+set lazyredraw
+
 
 " ========
 " Leader
