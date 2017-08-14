@@ -9,9 +9,13 @@ silent! if plug#begin('~/.local/share/nvim/plugged')
 
 " searching
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'rking/ag.vim'
+"Plug 'rking/ag.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'hinshun/fzf.vim'
+
+" text manipulation
+Plug 'junegunn/vim-pseudocl'
+Plug 'junegunn/vim-fnr'
 
 " movement
 Plug 'lokaltog/vim-easymotion'
@@ -114,9 +118,15 @@ nmap <leader>l <C-w><C-l>
 nmap <leader>j <C-w><C-j>
 nmap <leader>k <C-w><C-k>
 
+" send to black hole
+vmap <leader>d "_d
+nmap <leader>d "_d
+nmap <leader>dd "_dd
+nmap <leader>D "_D
+
 " fatih/go-vim
 " Find declarations in file
-nmap <leader>d :GoDecls<CR>
+nmap <leader>a :GoDecls<CR>
 " Find declarations in directory
 nmap <leader>s :GoDeclsDir<CR>
 " Go to definition under cursor
@@ -222,3 +232,6 @@ vnoremap <silent> <C-n> :call RangeUnCommentLine()<CR>
 map <leader> <Plug>(easymotion-prefix)
 hi link EasyMotionShade  Comment
 
+" fnr
+nmap <Leader>r <Plug>(FNR%)
+xmap <Leader>r <Plug>(FNR)
