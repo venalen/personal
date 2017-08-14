@@ -1,0 +1,18 @@
+[user]
+	name = Vicky Enalen
+	email = enalenv@gmail.com
+[url "git@github.com:"]
+	insteadOf = https://github.com
+[alias]
+	co = checkout
+	st = status
+	br = branch
+[core]
+	editor = nvim
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
