@@ -10,7 +10,7 @@ silent! if plug#begin('~/.local/share/nvim/plugged')
 " searching
 Plug 'ctrlpvim/ctrlp.vim'
 "Plug 'rking/ag.vim'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'do': './install --all' }
 Plug 'hinshun/fzf.vim'
 
 " text manipulation
