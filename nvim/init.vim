@@ -9,13 +9,16 @@ silent! if plug#begin('~/.local/share/nvim/plugged')
 
 " searching
 Plug 'ctrlpvim/ctrlp.vim'
-"Plug 'rking/ag.vim'
-Plug 'junegunn/fzf', { 'do': './install --all' }
-Plug 'hinshun/fzf.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'jremmen/vim-ripgrep'
 
 " text manipulation
 Plug 'junegunn/vim-pseudocl'
 Plug 'junegunn/vim-fnr'
+
+" set paste
+Plug 'ConradIrwin/vim-bracketed-paste'
 
 " movement
 Plug 'lokaltog/vim-easymotion'
@@ -25,14 +28,18 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 " language support
-Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'vim-syntastic/syntastic'
 Plug 'pangloss/vim-javascript'
 Plug 'plasticboy/vim-markdown'
 Plug 'honza/dockerfile.vim'
-"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'leafgarland/typescript-vim'
+Plug 'ianks/vim-tsx'
+Plug 'Quramy/tsuquyomi'
+Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 
 " file tree
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'preservim/nerdtree'
 
 " git
 Plug 'tpope/vim-fugitive'
@@ -46,7 +53,7 @@ Plug 'sudar/comments.vim'
 Plug 'jiangmiao/auto-pairs'
 
 " colours
-Plug 'chriskempson/vim-tomorrow-theme'
+Plug 'chriskempson/base16-vim'
 
 call plug#end()
 endif
@@ -87,7 +94,8 @@ set noswapfile
 " set minimum number of lines below the cursor
 set scrolloff=5
 " colours theme!
-silent! colorscheme Tomorrow-Night-Eighties
+set termguicolors
+silent! colorscheme base16-tomorrow-night-eighties
 " lower the delay of escaping out of other modes
 set timeoutlen=200
 
@@ -187,27 +195,36 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline_theme='bubblegum'
 
 " fatih/vim-go syntax highlighting
+syntax on
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
 let g:go_fmt_command = "goimports"
+
+" syntastic
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_go_checkers = ['golint', 'govet']
 
 " fzf search
 map <leader><leader> :Files<CR>
 
-" hinshun/fzf.vim
-let FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+"let FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 let g:fzf_layout = { 'window': '-tabnew' }
-"let g:fzf_layout = { 'down': '~40%' }
+let g:fzf_layout = { 'down': '~40%' }
 
-command! Plugs call fzf#run({
-  \ 'source':  map(sort(keys(g:plugs)), 'g:plug_home."/".v:val'),
-  \ 'options': '--delimiter / --nth -1',
-  \ 'down':    '~40%',
-  \ 'sink':    'Explore'})
+"command! Plugs call fzf#run({
+"  \ 'source':  map(sort(keys(g:plugs)), 'g:plug_home."/".v:val'),
+"  \ 'options': '--delimiter / --nth -1',
+"  \ 'down':    '~40%',
+"  \ 'sink':    'Explore'})
 
 " ctrlp
 " set working path to nearest git ancestor
@@ -235,3 +252,7 @@ hi link EasyMotionShade  Comment
 " fnr
 nmap <Leader>r <Plug>(FNR%)
 xmap <Leader>r <Plug>(FNR)
+
+" gitgutter
+let g:gitgutter_async=0
+set signcolumn=auto

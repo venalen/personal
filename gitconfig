@@ -16,3 +16,5 @@
 	process = git-lfs filter-process
 	required = true
 
+[url "ssh://git@github.com/Clever"]
+        insteadOf = https://github.com/Clever
