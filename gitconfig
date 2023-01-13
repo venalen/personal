@@ -1,8 +1,7 @@
 [user]
 	name = Vicky Enalen
 	email = enalenv@gmail.com
-[url "git@github.com:"]
-	insteadOf = https://github.com
+
 [alias]
 	co = checkout
 	st = status
@@ -16,5 +15,3 @@
 	process = git-lfs filter-process
 	required = true
 
-[url "ssh://git@github.com/Clever"]
-        insteadOf = https://github.com/Clever
