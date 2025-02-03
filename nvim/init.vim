@@ -37,6 +37,17 @@ Plug 'leafgarland/typescript-vim'
 Plug 'ianks/vim-tsx'
 Plug 'Quramy/tsuquyomi'
 Plug 'Shougo/vimproc.vim', { 'do': 'make' }
+Plug 'vim-ruby/vim-ruby' " support for running ruby
+Plug 'nelstrom/vim-textobj-rubyblock' " selecting ruby blocks
+Plug 'kana/vim-textobj-user' " needed for vim-textobj-rubyblock
+Plug 'tpope/vim-endwise' " add end to structures, mainly ruby
+Plug 'tpope/vim-rails'
+Plug 'github/copilot.vim'
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " file tree
 Plug 'preservim/nerdtree'
@@ -54,6 +65,9 @@ Plug 'jiangmiao/auto-pairs'
 
 " colours
 Plug 'chriskempson/base16-vim'
+
+Plug 'tpope/vim-surround'
+Plug 'AndrewRadev/splitjoin.vim'
 
 call plug#end()
 endif
@@ -76,6 +90,8 @@ set splitright
 set splitbelow
 " Highlight line cursor is on
 set cursorline
+" Highlight vertical line cursor is on
+set cursorcolumn
 " Highlight search pattern matches
 set hlsearch
 " Always show status line
@@ -83,7 +99,7 @@ set laststatus=2
 " Don't show the --insert-- --visual-- etc footers
 set noshowmode
 " Enable unicode
-set encoding=utf-8
+"set encoding=utf-8
 set backspace=indent,eol,start
 " Redraw screen to remove search highlighting
 nnoremap <silent> <C-l> :nohl<CR><C-l>
@@ -150,7 +166,7 @@ nmap <leader>/ :cnext<CR>
 " Quickfix window prev
 nmap <leader>. :cprev<CR>
 " Find all callers under cursor
-nmap <leader>c :GoCallers<CR>
+"nmap <leader>c :GoCallers<CR>
 
 " tpope/vim-fugitive
 nmap <leader>gs :GFiles?<CR>
@@ -219,6 +235,8 @@ map <leader><leader> :Files<CR>
 "let FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 let g:fzf_layout = { 'window': '-tabnew' }
 let g:fzf_layout = { 'down': '~40%' }
+"let g:fzf_colors =
+"\ { 'gutter':      ['bg', 'Normal'] }
 
 "command! Plugs call fzf#run({
 "  \ 'source':  map(sort(keys(g:plugs)), 'g:plug_home."/".v:val'),
@@ -256,3 +274,60 @@ xmap <Leader>r <Plug>(FNR)
 " gitgutter
 let g:gitgutter_async=0
 set signcolumn=auto
+
+" show hidden files in NERDTree
+let NERDTreeShowHidden=1
+
+" navigates to matching tags
+runtime macros/matchit.vim
+
+" trim trailing whitespace on save
+autocmd BufWritePre * %s/\s\+$//e
+
+" ruby provider for vim
+let g:ruby_host_prog = '~/.rbenv/versions/3.2.2/bin/neovim-ruby-host'
+
+" autocompletion for ruby files
+" currently does not work with my neovim setup because of lack of ruby
+" compilation
+"autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
+"autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+"autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+
+let g:LanguageClient_serverCommands = {
+    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+    \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
+    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
+    \ 'python': ['/usr/local/bin/pyls'],
+    \ 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
+    \ }
+let g:LanguageClient_loggingLevel = "DEBUG"
+let g:LanguageClient_loggingFile = expand('~/language_client.log')
+
+" Or map each action separately
+nmap <silent>K <Plug>(lcn-hover)
+nmap <silent> gd <Plug>(lcn-definition)
+nmap <silent> <F2> <Plug>(lcn-rename)
+
+" for copilot
+imap <silent><script><expr> <C-o> copilot#Accept("\<CR>")
+let g:copilot_no_tab_map = v:true
+
+" for coc.nvim
+inoremap <silent><expr> <C-n> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" copy relative path of current file to clipboard
+nmap <leader>cp :let @*=expand('%')<CR>
+" copy relative path of current file for spec
+nmap <leader>cs :let @*='bin/rspec ' . expand('%')<CR>
+" copy github path of current file
+" https://vi.stackexchange.com/questions/39786/expand-sometimes-gives-me-a-full-path
+nmap <leader>cc :let @*='https://github.com/patch-technology/patch/tree/main/' . expand('%:.')<CR>
+nmap <leader>cg :let @*='https://github.com/patch-technology/patch/commit/' . expand("<cword>")<CR>
+
+let g:splitjoin_split_mapping = ''
+let g:splitjoin_join_mapping = ''
+
+nmap <leader>j :SplitjoinJoin<cr>
+nmap <leader>s :SplitjoinSplit<cr>
