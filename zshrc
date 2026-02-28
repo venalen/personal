@@ -10,71 +10,53 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-#if [ -f /Users/vicky.enalen/.clever_bash ]; then source /Users/vicky.enalen/.clever_bash; else echo "ERROR: Could not find /Users/vicky.enalen/.clever_bash"; fi
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 fpath=(~/.zsh/completion $fpath)
 autoload -Uz compinit && compinit -i
 export FZF_DEFAULT_OPTS="--no-separator --border=rounded --color='bg:-1,fg+:4,gutter:-1' --bind 'ctrl-d:preview-half-page-down,ctrl-u:preview-half-page-up'"
 
+alias tmux='tmux -f ~/github.com/venalen/personal/tmux.conf'
 alias vim='nvim'
-alias vim-listen='nvim --listen /tmp/nvim_xray.pipe'
-alias proj='cd $HOME/patch-technology/patch'
-# clean up branches, get new bundles, get new node packages, restart spring, run migration
-alias pu='git gc --prune=now && git remote prune origin && bundle install && yarn && spring stop && bin/rails db:migrate && bin/rails restart'
-alias k8ss='export AWS_PROFILE=staging && make update-k8s-conf-staging'
-alias k8sp='export AWS_PROFILE=production && make update-k8s-conf-production'
-alias k8sconsole='kubectl exec -it -n patch $(kubectl get pod -n patch | grep rails | awk "{print $1}") -- rails console'
-#export GOROOT='/usr/local/go'
-export GOPATH=$HOME/go
-#export AWS_PROFILE=main-engineer
 
 export EDITOR='nvim'
+export BAT_THEME="catppuccin Macchiato"
 
-# Base16 Shell https://github.com/chriskempson/base16-shell
-BASE16_SHELL="$HOME/.config/base16-shell/"
-[ -n "$PS1" ] && \
-    [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
-        eval "$("$BASE16_SHELL/profile_helper.sh")"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# AWS
-#alias s2a='saml2aws login --skip-prompt && export AWS_PROFILE=main-engineer'
-#s2a
+# pnpm
+export PNPM_HOME="/Users/vickyenalen/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
 
-eval "$(rbenv init - zsh)"
-eval "$(~/.rbenv/bin/rbenv init - zsh)"
-
-# nvm
-#export NVM_DIR=~/.nvm
-
-# pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-eval export PATH="/Users/vickyenalen/.jenv/shims:${PATH}"
-export JENV_SHELL=zsh
-export JENV_LOADED=1
-unset JAVA_HOME
-unset JDK_HOME
-source '/opt/homebrew/Cellar/jenv/0.5.7/libexec/libexec/../completions/jenv.zsh'
-jenv rehash 2>/dev/null
-jenv refresh-plugins
-jenv() {
-  type typeset &> /dev/null && typeset command
-  command="$1"
-  if [ "$#" -gt 0 ]; then
-    shift
+# propel
+awscheck() {
+  if aws sts get-caller-identity > /dev/null 2>&1; then
+    echo "✅ AWS is authenticated"
+  else
+    aws sso login
   fi
-
-  case "$command" in
-  enable-plugin|rehash|shell|shell-options)
-    eval `jenv "sh-$command" "$@"`;;
-  *)
-    command jenv "$command" "$@";;
-  esac
+  echo "AWS authentication check complete."
 }
+alias proj='cd ~/github.com/propelinc'
+#alias login_all='awscheck | login_docker'
+alias login_all='awscheck; login_docker'
+alias login_docker='aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 608965757603.dkr.ecr.us-west-2.amazonaws.com'
+alias update_all='~/github.com/propelinc/budwood/update-all-backends'
+alias start_app='login_all; cd ~/github.com/propelinc/budwood/; tilt up'
+alias kd="kubectl --context=eks-development"
+alias kg="kubectl --context=eks-global"
+alias ks="kubectl --context=eks-staging"
+alias kp="kubectl --context=eks-production"
+alias kvd="kubectl --context=eks-vault-dev"
+alias kvp="kubectl --context=eks-vault-prod"
+alias kbd="kubectl --context=eks-brokerage-dev"
+alias kbs="kubectl --context=eks-brokerage-staging"
+alias kbp="kubectl --context=eks-brokerage-prod"
+# Created by `pipx` on 2025-06-02 21:46:12
+export PATH="$PATH:/Users/vickyenalen/.local/bin:$HOME/.local/bin"
+eval "$(mise activate zsh)"

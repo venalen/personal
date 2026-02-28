@@ -8,57 +8,40 @@
 silent! if plug#begin('~/.local/share/nvim/plugged')
 
 " searching
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug 'jremmen/vim-ripgrep'
+Plug 'alexpasmantier/tv.nvim'
 
 " text manipulation
 Plug 'junegunn/vim-pseudocl'
 Plug 'junegunn/vim-fnr'
 
-" set paste
-Plug 'ConradIrwin/vim-bracketed-paste'
-
 " movement
-Plug 'lokaltog/vim-easymotion'
+Plug 'easymotion/vim-easymotion'
 
 " buffers/status
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 " language support
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'vim-syntastic/syntastic'
 Plug 'pangloss/vim-javascript'
 Plug 'plasticboy/vim-markdown'
 Plug 'honza/dockerfile.vim'
 Plug 'leafgarland/typescript-vim'
-Plug 'ianks/vim-tsx'
-Plug 'Quramy/tsuquyomi'
-Plug 'Shougo/vimproc.vim', { 'do': 'make' }
-Plug 'vim-ruby/vim-ruby' " support for running ruby
-Plug 'nelstrom/vim-textobj-rubyblock' " selecting ruby blocks
-Plug 'kana/vim-textobj-user' " needed for vim-textobj-rubyblock
-Plug 'tpope/vim-endwise' " add end to structures, mainly ruby
-Plug 'tpope/vim-rails'
 Plug 'github/copilot.vim'
-Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
+Plug 'davidhalter/jedi-vim'
+Plug 'dense-analysis/ale'
 " file tree
 Plug 'preservim/nerdtree'
-
 " git
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
-Plug 'junegunn/gv.vim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'sindrets/diffview.nvim'
 
 " comments
 Plug 'sudar/comments.vim'
+
+" markdown
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
 
 " bracket matching
 Plug 'jiangmiao/auto-pairs'
@@ -75,7 +58,6 @@ endif
 " ========
 " General
 " ========
-set t_Co=256
 " Set line numbers
 set number
 " Line will wrap
@@ -112,6 +94,11 @@ set scrolloff=5
 " colours theme!
 set termguicolors
 silent! colorscheme base16-tomorrow-night-eighties
+" diff colours (github-inspired, subtle for dark background)
+highlight DiffAdd     guibg=#1a2e1a guifg=NONE
+highlight DiffDelete  guibg=#2e1a1a guifg=#5c3030
+highlight DiffChange  guibg=#1a2a3a guifg=NONE
+highlight DiffText    guibg=#2a4060 guifg=NONE
 " lower the delay of escaping out of other modes
 set timeoutlen=200
 
@@ -129,9 +116,7 @@ set lazyredraw
 
 " map leader to space
 let mapleader = " "
-let g:mapleader = " "
 let maplocalleader = " "
-let g:maplocalleader = " "
 
 " nerd tree remap
 nmap <leader>kb :NERDTreeToggle<CR>
@@ -139,7 +124,6 @@ nmap <leader>kb :NERDTreeToggle<CR>
 " split navigation
 nmap <leader>h <C-w><C-h>
 nmap <leader>l <C-w><C-l>
-nmap <leader>j <C-w><C-j>
 nmap <leader>k <C-w><C-k>
 
 " send to black hole
@@ -148,31 +132,15 @@ nmap <leader>d "_d
 nmap <leader>dd "_dd
 nmap <leader>D "_D
 
-" fatih/go-vim
+" jedi-vim
 " Find declarations in file
-nmap <leader>a :GoDecls<CR>
-" Find declarations in directory
-nmap <leader>s :GoDeclsDir<CR>
 " Go to definition under cursor
-nmap <leader>] :GoDef<CR>
+let g:jedi#completions_command = "<C-N>"
+let g:jedi#rename_command = ""
+nmap <silent> <leader>a :call jedi#goto_assignments()<CR>
+nmap <silent> <leader>] :call jedi#goto_definitions()<CR>
 " Go to previous definition
-nmap <leader>[ :GoDefPop<CR>
-" Location window next
-nmap <leader>' :lnext<CR>
-" Location window prev
-nmap <leader>: :lprev<CR>
-" Quickfix window next
-nmap <leader>/ :cnext<CR>
-" Quickfix window prev
-nmap <leader>. :cprev<CR>
-" Find all callers under cursor
-"nmap <leader>c :GoCallers<CR>
-
-" tpope/vim-fugitive
-nmap <leader>gs :GFiles?<CR>
-
-" ag/silver searcher
-"nnoremap <leader>ag :Ag --ignore-dir vendor -G go$<space>
+"nmap <leader>[ :jedi#goto_definitions<CR>
 
 " ===============
 " Buffer Movement
@@ -210,47 +178,45 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 " Colour theme for airline
 let g:airline_theme='bubblegum'
 
-" fatih/vim-go syntax highlighting
 syntax on
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_extra_types = 1
-let g:go_fmt_command = "goimports"
 
-" syntastic
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_go_checkers = ['golint', 'govet']
+"python3 provider
+let g:python3_host_prog = '/opt/homebrew/bin/python3'
 
-" fzf search
-map <leader><leader> :Files<CR>
 
-"let FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
-let g:fzf_layout = { 'window': '-tabnew' }
-let g:fzf_layout = { 'down': '~40%' }
-"let g:fzf_colors =
-"\ { 'gutter':      ['bg', 'Normal'] }
+let $BAT_THEME = "base16"
 
-"command! Plugs call fzf#run({
-"  \ 'source':  map(sort(keys(g:plugs)), 'g:plug_home."/".v:val'),
-"  \ 'options': '--delimiter / --nth -1',
-"  \ 'down':    '~40%',
-"  \ 'sink':    'Explore'})
-
-" ctrlp
-" set working path to nearest git ancestor
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
-if executable('ag')
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-endif
+" tv.nvim
+lua << EOF
+local h = require("tv").handlers
+local tv = require("tv")
+tv.setup({
+  channels = {
+    files = {
+      keybinding = "<leader><leader>",
+      args = { "--no-remote", "--no-status-bar", "--preview-command", "bat -n --color=always --theme='Catppuccin Macchiato' '{}'" },
+      handlers = {
+        ["<CR>"] = h.open_as_files,
+        ["<C-s>"] = h.open_in_split,
+        ["<C-v>"] = h.open_in_vsplit,
+        ["<C-y>"] = h.copy_to_clipboard,
+        ["<C-q>"] = h.send_to_quickfix,
+      },
+    },
+    text = {
+      keybinding = "<leader>t",
+      args = { "--no-remote", "--no-status-bar", "--preview-command", "bat -n --color=always --theme='Catppuccin Macchiato' '{strip_ansi|split:\\::0}'" },
+      handlers = {
+        ["<CR>"] = h.open_at_line,
+        ["<C-s>"] = h.open_in_split,
+        ["<C-v>"] = h.open_in_vsplit,
+        ["<C-y>"] = h.copy_to_clipboard,
+        ["<C-q>"] = h.send_to_quickfix,
+      },
+    },
+  },
+})
+EOF
 
 " comments
 let g:comments_map_keys = 0
@@ -271,6 +237,31 @@ hi link EasyMotionShade  Comment
 nmap <Leader>r <Plug>(FNR%)
 xmap <Leader>r <Plug>(FNR)
 
+" diffview
+lua << DIFFEOF
+local actions = require("diffview.actions")
+require("diffview").setup({
+  use_icons = false,
+  keymaps = {
+    view = {
+      { "n", "<leader>b", false },
+    },
+    file_panel = {
+      { "n", "<leader>b", false },
+    },
+    file_history_panel = {
+      { "n", "<leader>b", false },
+    },
+  },
+})
+DIFFEOF
+nmap <leader>gd :DiffviewOpen<CR>
+nmap <leader>gm :DiffviewOpen main<CR>
+nmap <leader>gh :DiffviewFileHistory %<CR>
+nmap <leader>gH :DiffviewFileHistory<CR>
+nmap <leader>gp :DiffviewOpen main...HEAD<CR>
+nmap <leader>gq :DiffviewClose<CR>
+
 " gitgutter
 let g:gitgutter_async=0
 set signcolumn=auto
@@ -284,38 +275,20 @@ runtime macros/matchit.vim
 " trim trailing whitespace on save
 autocmd BufWritePre * %s/\s\+$//e
 
-" ruby provider for vim
-let g:ruby_host_prog = '~/.rbenv/versions/3.2.2/bin/neovim-ruby-host'
+" ale autoformatting support
+let g:ale_linters_explicit = 1
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'python': ['autoimport', 'ruff', 'ruff_format', 'pycln'],
+\}
+nmap <leader>x <Plug>(ale_fix)
+"let g:ale_lint_on_save = 1
+"let g:ale_lint_on_text_changed = 'always'
 
-" autocompletion for ruby files
-" currently does not work with my neovim setup because of lack of ruby
-" compilation
-"autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
-"autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
-"autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
-
-let g:LanguageClient_serverCommands = {
-    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-    \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
-    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
-    \ 'python': ['/usr/local/bin/pyls'],
-    \ 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
-    \ }
-let g:LanguageClient_loggingLevel = "DEBUG"
-let g:LanguageClient_loggingFile = expand('~/language_client.log')
-
-" Or map each action separately
-nmap <silent>K <Plug>(lcn-hover)
-nmap <silent> gd <Plug>(lcn-definition)
-nmap <silent> <F2> <Plug>(lcn-rename)
 
 " for copilot
 imap <silent><script><expr> <C-o> copilot#Accept("\<CR>")
 let g:copilot_no_tab_map = v:true
-
-" for coc.nvim
-inoremap <silent><expr> <C-n> coc#pum#visible() ? coc#pum#confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " copy relative path of current file to clipboard
 nmap <leader>cp :let @*=expand('%')<CR>
@@ -323,11 +296,23 @@ nmap <leader>cp :let @*=expand('%')<CR>
 nmap <leader>cs :let @*='bin/rspec ' . expand('%')<CR>
 " copy github path of current file
 " https://vi.stackexchange.com/questions/39786/expand-sometimes-gives-me-a-full-path
-nmap <leader>cc :let @*='https://github.com/patch-technology/patch/tree/main/' . expand('%:.')<CR>
-nmap <leader>cg :let @*='https://github.com/patch-technology/patch/commit/' . expand("<cword>")<CR>
+nnoremap <leader>cc :silent! call system('open https://' . substitute(join(split(substitute(system("git rev-parse --show-toplevel"), '\n\\+$', '', ''), '/')[2:], '/') . '/tree/main/' . expand('%:.'), '[^[:print:]]', '', ''))<CR>
+nnoremap <leader>cg :silent! call system('open https://' . substitute(join(split(substitute(system("git rev-parse --show-toplevel"), '\n\\+$', '', ''), '/')[2:], '/') . '/commit/' . expand('<cword>'), '[^[:print:]]', '', ''))<CR>
 
 let g:splitjoin_split_mapping = ''
 let g:splitjoin_join_mapping = ''
 
 nmap <leader>j :SplitjoinJoin<cr>
 nmap <leader>s :SplitjoinSplit<cr>
+
+:set colorcolumn=79,100
+highlight ColorColumn guibg=#1c1c1c
+
+nnoremap <leader>sv :source $MYVIMRC<CR>
+
+command! SC vnew
+        \ | setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile
+        \ | nnoremap <buffer> ,<CR> :silent %source<CR>
+
+" markdown preview
+nmap <C-p> <Plug>MarkdownPreviewToggle
