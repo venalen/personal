@@ -1,0 +1,15 @@
+{
+  "name": "expense_tracker",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client && npm run build --prefix server",
+    "start": "node server/dist/index.js",
+    "postinstall": "npm install --prefix server && npm install --prefix client",
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "test": "npm test --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
