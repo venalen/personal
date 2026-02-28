@@ -24,15 +24,15 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 router.put('/:id', async (req: Request, res: Response) => {
-  const { amount, date, paidBy, paidTo } = req.body;
+  const { amount, date } = req.body;
   const amountCents = Math.round(amount * 100);
 
   const result = await pool.query(
     `UPDATE payments
-     SET amount_cents = $1, date = $2, paid_by = $3, paid_to = $4
-     WHERE id = $5
+     SET amount_cents = $1, date = $2
+     WHERE id = $3
      RETURNING *`,
-    [amountCents, date, paidBy, paidTo, req.params.id]
+    [amountCents, date, req.params.id]
   );
   if (result.rows.length === 0) {
     res.status(404).json({ error: 'Not found' });

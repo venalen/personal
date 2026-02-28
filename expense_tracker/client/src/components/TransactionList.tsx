@@ -79,7 +79,7 @@ export default function TransactionList({
       description: t.description,
       notes: t.notes || '',
       amount: (t.amount_cents / 100).toFixed(2),
-      date: t.date,
+      date: t.date.slice(0, 10),
       paidBy: t.paid_by,
       splitUser1Percent: String(t.split_user1_percent),
       splitMode: t.split_mode || 'percentage',
@@ -92,7 +92,7 @@ export default function TransactionList({
     setEditingId(`p-${p.id}`);
     setEditForm({
       amount: (p.amount_cents / 100).toFixed(2),
-      date: p.date,
+      date: p.date.slice(0, 10),
     });
   }
 
