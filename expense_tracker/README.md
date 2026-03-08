@@ -4,26 +4,38 @@ A shared expense tracker for two people. Log transactions, record payments, and 
 
 Built with React + Vite (client) and Express + PostgreSQL (server).
 
-## Setup
+## Running locally
 
-### Prerequisites
+### With Docker (recommended)
+
+```sh
+docker compose up --build
+```
+
+This starts PostgreSQL and the app together. The database is created automatically. Access the app at `http://localhost:3000`.
+
+To stop: `docker compose down` (add `-v` to also wipe the database volume).
+
+### Without Docker
+
+#### Prerequisites
 
 - Node.js 20+
 - PostgreSQL 16
 
-### Create the database
+#### Create the database
 
 ```sh
 /opt/homebrew/opt/postgresql@16/bin/createdb expense_tracker
 ```
 
-### Install dependencies
+#### Install dependencies
 
 ```sh
 npm install
 ```
 
-### Configure environment
+#### Configure environment
 
 Copy the example and fill in your values:
 
@@ -37,13 +49,31 @@ cp .env.example .env
 | `USER1_NAME` | Display name for user1 | `User 1` |
 | `USER2_NAME` | Display name for user2 | `User 2` |
 
-## Running locally
+#### Start the app
 
 ```sh
 DATABASE_URL=postgresql://localhost/expense_tracker npm run dev
 ```
 
 This starts the server on port 3000 and the client on port 5173 (or next available) via `concurrently`.
+
+## Seed Data
+
+Populate the database with sample transactions and payments across several months.
+
+### With Docker
+
+```sh
+docker compose exec -T db psql -U postgres -d expense_tracker < server/src/seed.sql
+```
+
+### Without Docker
+
+```sh
+npm run seed --prefix server
+```
+
+The seed script truncates existing data first, so it's safe to re-run.
 
 ## Tests
 

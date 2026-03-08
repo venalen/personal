@@ -5,6 +5,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "seed": "/opt/homebrew/opt/postgresql@16/bin/psql ${DATABASE_URL:-postgresql://localhost/expense_tracker} -f src/seed.sql",
     "pretest": "/opt/homebrew/opt/postgresql@16/bin/createdb expense_tracker_test 2>/dev/null || true",
     "test": "DATABASE_URL=postgresql://localhost/expense_tracker_test vitest run"
   },

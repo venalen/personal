@@ -169,7 +169,6 @@ export default function TransactionList({
 
   return (
     <div className="transaction-list">
-      <h3>History</h3>
       <ul>
         {items.map((item) => {
           if (item.type === 'transaction') {

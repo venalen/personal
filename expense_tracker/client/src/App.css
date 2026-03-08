@@ -381,11 +381,48 @@ body::after {
   cursor: not-allowed;
 }
 
+/* History Panel — tabs + list */
+.history-panel {
+  position: relative;
+}
+
+/* Month Tabs */
+.month-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0.5rem;
+  gap: 2px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: -1px;
+}
+
+.month-tab {
+  flex: 0 0 auto;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  border: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-radius: 8px 8px 0 0;
+  background: #eee;
+  color: #666;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.month-tab.active {
+  background: #fff;
+  color: #333;
+  font-weight: 600;
+  border-bottom-color: #fff;
+}
+
 /* Transaction List */
 .transaction-list {
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 0 8px 8px 8px;
   padding: 1rem;
 }
 

@@ -5,22 +5,47 @@
 From the `expense_tracker/` directory:
 
 ```sh
+docker compose up --build
+```
+
+This builds the app image and starts both the app (port 3000) and PostgreSQL. The database is created automatically. Access the app at `http://localhost:3000`.
+
+To stop: `docker compose down` (add `-v` to also wipe the database volume).
+
+### Without Docker
+
+If you prefer running outside Docker:
+
+```sh
 DATABASE_URL=postgresql://localhost/expense_tracker npm run dev
 ```
 
-This starts both the server (port 3000) and client (Vite, port 5173+) via `concurrently`.
+This starts the server (port 3000) and client (Vite, port 5173+) via `concurrently`.
 
-**`DATABASE_URL` is required.** Without it, `pg` defaults to using the OS username as the database name, which will fail with `database "username" does not exist`.
+**Prerequisites:**
+- PostgreSQL 16 must be running locally
+- The `expense_tracker` database must exist: `/opt/homebrew/opt/postgresql@16/bin/createdb expense_tracker`
+- `DATABASE_URL` is required — without it, `pg` defaults to using the OS username as the database name
 
-**Port 3000 conflicts:** If the server fails with `EADDRINUSE`, a previous instance is still running. Kill it first:
+**Port 3000 conflicts:** If the server fails with `EADDRINUSE`, kill the previous instance:
 
 ```sh
 kill $(lsof -ti:3000)
 ```
 
-### Prerequisites
-- PostgreSQL 16 must be running locally
-- The `expense_tracker` database must exist: `/opt/homebrew/opt/postgresql@16/bin/createdb expense_tracker`
+## Seed Data
+
+Populate the database with sample transactions and payments spanning multiple months. The seed script truncates existing data first, so it's safe to re-run.
+
+**Docker:**
+```sh
+docker compose exec -T db psql -U postgres -d expense_tracker < server/src/seed.sql
+```
+
+**Without Docker:**
+```sh
+npm run seed --prefix server
+```
 
 ## Test Suite
 
