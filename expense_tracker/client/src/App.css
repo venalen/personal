@@ -83,17 +83,47 @@ body::after {
   max-width: 360px;
 }
 
-.passphrase-screen input {
+.passphrase-input-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  border: 2px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.passphrase-input-wrapper input {
   flex: 1;
   min-width: 0;
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
-  border: 2px solid #333;
-  border-radius: 8px;
+  border: none;
   outline: none;
 }
 
-.passphrase-screen button {
+.toggle-visibility-btn {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.7rem;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  color: #bbb;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.toggle-visibility-btn:hover {
+  color: #999;
+}
+
+.passphrase-screen button:not(.toggle-visibility-btn) {
   padding: 0.5rem 1.25rem;
   font-size: 1rem;
   border: 2px solid #333;
@@ -104,7 +134,7 @@ body::after {
   transition: background 0.2s;
 }
 
-.passphrase-screen button:hover {
+.passphrase-screen button:not(.toggle-visibility-btn):hover {
   background: #555;
 }
 

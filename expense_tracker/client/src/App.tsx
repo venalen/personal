@@ -17,6 +17,7 @@ export default function App() {
     () => sessionStorage.getItem('authenticated') === 'true'
   );
   const [passphrase, setPassphrase] = useState('');
+  const [showPassphrase, setShowPassphrase] = useState(false);
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [user1Name, setUser1Name] = useState('User 1');
@@ -48,13 +49,23 @@ export default function App() {
       <div className="passphrase-screen">
         <h1 className="app-title">Better Have My Money</h1>
         <form onSubmit={handlePassphraseSubmit}>
-          <input
-            type="text"
-            placeholder="Enter passphrase"
-            value={passphrase}
-            onChange={(e) => setPassphrase(e.target.value)}
-            autoFocus
-          />
+          <div className="passphrase-input-wrapper">
+            <input
+              type={showPassphrase ? 'text' : 'password'}
+              placeholder="Enter passphrase"
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              autoFocus
+            />
+            <button
+              type="button"
+              className="toggle-visibility-btn"
+              onClick={() => setShowPassphrase(!showPassphrase)}
+              tabIndex={-1}
+            >
+              {showPassphrase ? 'Hide' : 'Show'}
+            </button>
+          </div>
           <button type="submit">Enter</button>
         </form>
         {error && <p className="passphrase-error">{error}</p>}
