@@ -321,7 +321,7 @@ export default function TransactionList({
                   <div className="item-details">
                     <span className="item-amount">{formatDollars(t.amount_cents)}</span>
                     <span className="item-meta">
-                      paid by {displayName(t.paid_by, user1Name, user2Name)} &middot; {formatDate(t.date)}
+                      paid by <span className={`user-pill user-pill--${t.paid_by}`}>{displayName(t.paid_by, user1Name, user2Name)}</span> &middot; {formatDate(t.date)}
                       {' '}&middot; {splitDisplay}
                     </span>
                   </div>
@@ -388,7 +388,7 @@ export default function TransactionList({
                   <div className="item-details">
                     <span className="item-amount">{formatDollars(p.amount_cents)}</span>
                     <span className="item-meta">
-                      {displayName(p.paid_by, user1Name, user2Name)} paid {displayName(p.paid_to, user1Name, user2Name)} &middot;{' '}
+                      <span className={`user-pill user-pill--${p.paid_by}`}>{displayName(p.paid_by, user1Name, user2Name)}</span> paid <span className={`user-pill user-pill--${p.paid_to}`}>{displayName(p.paid_to, user1Name, user2Name)}</span> &middot;{' '}
                       {formatDate(p.date)}
                     </span>
                   </div>

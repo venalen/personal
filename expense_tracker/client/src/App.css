@@ -272,7 +272,7 @@ body::after {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: 600px) {
@@ -507,10 +507,47 @@ body::after {
 }
 
 .payment-item {
-  background: #f9f9f9;
+  background: #dcfce7;
+  border-left: 3px solid #4ade80;
   border-radius: 4px;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+/* User pills */
+.user-pill {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.user-pill--user1 {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.user-pill--user2 {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Search input */
+.search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input:focus {
+  border-color: #999;
 }
 
 .edit-btn {

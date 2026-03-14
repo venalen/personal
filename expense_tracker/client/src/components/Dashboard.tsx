@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import Fuse from 'fuse.js';
 import { User, Transaction, Payment, Balance } from '../types';
 import { fetchTransactions, fetchPayments, fetchBalance } from '../api';
 import BalanceSummary from './BalanceSummary';
@@ -28,6 +29,7 @@ export default function Dashboard({ currentUser, onSwitchUser, user1Name, user2N
   const [payments, setPayments] = useState<Payment[]>([]);
   const [balance, setBalance] = useState<Balance | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const displayName = currentUser === 'user1' ? user1Name : user2Name;
 
@@ -60,6 +62,37 @@ export default function Dashboard({ currentUser, onSwitchUser, user1Name, user2N
     [payments, activeMonth]
   );
 
+  const resolveName = useCallback((user: string) => user === 'user1' ? user1Name : user2Name, [user1Name, user2Name]);
+
+  const searchedTransactions = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const items = transactions.map(t => ({
+      ...t,
+      _paidByName: resolveName(t.paid_by),
+    }));
+    const fuse = new Fuse(items, {
+      keys: ['description', 'notes', '_paidByName'],
+      threshold: 0.4,
+    });
+    return fuse.search(searchQuery).map(r => r.item as Transaction);
+  }, [searchQuery, transactions, resolveName]);
+
+  const searchedPayments = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const items = payments.map(p => ({
+      ...p,
+      _paidByName: resolveName(p.paid_by),
+      _paidToName: resolveName(p.paid_to),
+    }));
+    const fuse = new Fuse(items, {
+      keys: ['_paidByName', '_paidToName'],
+      threshold: 0.4,
+    });
+    return fuse.search(searchQuery).map(r => r.item as Payment);
+  }, [searchQuery, payments, resolveName]);
+
+  const isSearching = searchQuery.trim().length > 0;
+
   const loadData = useCallback(async () => {
     const [txs, pays, bal] = await Promise.all([
       fetchTransactions(),
@@ -90,7 +123,14 @@ export default function Dashboard({ currentUser, onSwitchUser, user1Name, user2N
         <PaymentForm currentUser={currentUser} onCreated={loadData} user1Name={user1Name} user2Name={user2Name} />
       </div>
       <div className="history-panel">
-        <div className="month-tabs">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search transactions..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="month-tabs" style={isSearching ? { display: 'none' } : undefined}>
           {availableMonths.map(ym => (
             <button
               key={ym}
@@ -103,8 +143,8 @@ export default function Dashboard({ currentUser, onSwitchUser, user1Name, user2N
         </div>
         <TransactionList
           currentUser={currentUser}
-          transactions={filteredTransactions}
-          payments={filteredPayments}
+          transactions={isSearching ? (searchedTransactions ?? []) : filteredTransactions}
+          payments={isSearching ? (searchedPayments ?? []) : filteredPayments}
           onChanged={loadData}
           user1Name={user1Name}
           user2Name={user2Name}
