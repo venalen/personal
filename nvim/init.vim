@@ -181,7 +181,7 @@ let g:airline_theme='bubblegum'
 syntax on
 
 "python3 provider
-let g:python3_host_prog = '/opt/homebrew/bin/python3'
+let g:python3_host_prog = '/opt/homebrew/bin/python3.13'
 
 
 let $BAT_THEME = "base16"

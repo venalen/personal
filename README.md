@@ -40,3 +40,10 @@ Config/rc files for alacritty, tmux, (n)vim, zsh
   zstyle ':prezto:module:prompt' show-return-val 'yes' #uncomment
 
 10. Codi settings: had to override bin to python3
+11. Claude Code config:
+	- mkdir -p ~/.claude/agents
+	- ln -s ~/github.com/venalen/personal/dot-claude/CLAUDE.md ~/.claude/CLAUDE.md
+	- ln -s ~/github.com/venalen/personal/dot-claude/agents/self-reviewer.md ~/.claude/agents/self-reviewer.md
+	- ln -s ~/github.com/venalen/personal/dot-claude/CODEREVIEWTONE.md ~/.claude/CODEREVIEWTONE.md
+	- mkdir -p ~/.claude/skills
+	- ln -s ~/github.com/venalen/personal/dot-claude/skills/review-pr ~/.claude/skills/review-pr
