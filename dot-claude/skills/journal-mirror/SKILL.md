@@ -550,3 +550,20 @@ Read `journal-mirror/index.md`, `journal-mirror/keywords.yml`, and scan `journal
 ```
 
 Check for stale syntheses by comparing synthesis file modification dates against entry dates for each topic.
+
+## Journal naming
+
+Journals are named by type and sequential number: `Bear #1`, `Moleskine #1`, etc. The number is scoped to the type — a second Bear journal becomes `Bear #2`.
+
+**Slugified form for filenames:** lowercase, spaces to hyphens, number appended: `bear-1`, `moleskine-1`.
+
+**Page numbers:** Zero-padded to 3 digits: `p001`, `p042`, `p100`.
+
+When Vicky says she's starting a new journal:
+1. Ask the journal name/type if not provided
+2. Check `index.md` for existing journals of that type
+3. Assign the next number
+4. Add to `index.md` under `## Journals` with today's date
+5. Start tracking pages from 1
+
+If only one journal of a type exists, Vicky may omit the number in conversation (e.g., "Bear p.42" = Bear #1).
