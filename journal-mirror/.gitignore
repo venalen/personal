@@ -1,0 +1,8 @@
+# Personal journal content — not version controlled
+entries/*.md
+raw/*.md
+syntheses/*.md
+rollups/*.md
+
+# Keep the directories themselves
+!.gitkeep
