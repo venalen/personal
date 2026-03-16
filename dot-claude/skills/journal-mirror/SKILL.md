@@ -211,3 +211,143 @@ Example: `rollups/attention-mechanisms.md`
 **Path:** `journal-mirror/syntheses/TOPIC.md`
 
 Same structure as rollup but more comprehensive — a consolidated reference doc (default) or timeline narrative (on request).
+
+## Ingest workflow
+
+Triggered by `$ARGUMENTS` starting with `ingest`, or when photos are attached with no explicit command.
+
+**Confidence-gated clarification:** Throughout this workflow, if your confidence in a transcription, segmentation, or keyword extraction is low, ask a clarifying question rather than guessing. This applies to handwriting ambiguity, topic boundaries, and keyword categorization.
+
+### Step 1 — Identify pages
+
+Look at the attached photo(s). For each photo:
+1. Identify the journal (check `index.md` for registered journals; if unknown, ask which journal this is from)
+2. Read the page number (usually visible at top or bottom of page)
+3. Determine if this is a daily page, monthly page, or study notes
+
+If no journal is registered yet, ask:
+> "What's the name of this journal? (e.g., 'Bear', 'Moleskine')"
+
+Then register it in `index.md` under `## Journals` with today's date and `#1` as the sequence number.
+
+### Step 2 — Transcribe each page
+
+For each physical page, create a raw transcription file at `journal-mirror/raw/JOURNAL_pPAGE.md`.
+
+Follow the handwriting conventions section above for bullet and color notation. Preserve the original structure — do not summarize, reorganize, or clean up. Include:
+- All bullet types with correct symbols
+- Color markers for green and red text
+- Indentation for continued thoughts
+- Special content descriptions (mementos, doodles)
+
+Set frontmatter fields:
+- `journal`: slugified journal name (e.g., `bear-1`)
+- `page`: page number (integer)
+- `date_ingested`: today's date
+- `date_written`: from the green date header on the page (ask if unclear)
+- `page_complete`: `true` unless the writing clearly continues onto the next page or ends mid-thought — in that case set `false`
+
+**If the page was previously ingested** (raw file already exists):
+1. Read the existing raw file
+2. Transcribe the new version
+3. Diff them — identify what was added, changed, or removed
+4. Overwrite the raw file with the new transcription
+5. Note the changes for the report in Step 7
+
+### Step 3 — Segment into topic-chunks
+
+For each page, identify distinct topics. A new topic starts when:
+- A new green header appears (date or study topic)
+- The subject matter clearly shifts (e.g., from todos to journal reflection)
+- There's a visual separator on the page
+
+For each topic-chunk, create or update a structured entry at:
+`journal-mirror/entries/YYYY-MM-DD_JOURNAL_pSTART-END_TOPIC.md`
+
+Where:
+- `YYYY-MM-DD` = the date written (from the page)
+- `JOURNAL` = slugified journal name (e.g., `bear-1`)
+- `pSTART-END` = zero-padded page range (e.g., `p022-022` for a single page, `p022-023` if it spans pages)
+- `TOPIC` = slugified topic name (e.g., `attention-mechanisms`, `daily-todos`, `daily-reflection`)
+
+Write a concise summary of the topic-chunk content. Include:
+- Key points, decisions, and ideas
+- Todo status (what's done, deferred, pending)
+- Red-highlighted branching ideas — call these out specifically
+- For diagrams: text description + optional Mermaid/SVG recreation
+
+Set frontmatter: `date`, `journal`, `page_start`, `page_end`, `topic`, `keywords` (list), `has_diagram` (boolean), `references` (list, empty unless study entry).
+
+**For monthly pages:** Create a single entry at `entries/YYYY-MM_JOURNAL_monthly.md` with `type: monthly` in frontmatter. Transcribe the calendar layout, extract birthdays, then process the habit tracker:
+1. Identify each colored line and read its blue label to determine what it tracks
+2. For each habit, count the number of days marked out of the month's total days
+3. Identify streaks (consecutive days marked) — note the longest streak and its date range
+4. Calculate completion rate as a percentage
+5. Produce a per-habit summary (e.g., "Workouts: 22/31 days, 8-day streak 3/10-3/17, 71%")
+6. Build the habit tracking table (see file formats section)
+7. If any colored line has no label or you can't identify the habit, ask for clarification
+
+**For study entries:** After creating the entry, ask:
+> "I see study notes on [topic] — were there reference materials you used? (links, books, etc.)"
+
+Store any provided links in the `references` frontmatter field.
+
+**For re-ingested pages:** Compare new topic-chunks against existing entries for the same page range. Update modified entries, create new ones for new topics, and note changes.
+
+### Step 4 — Update keywords
+
+Read `journal-mirror/keywords.yml`. For each keyword extracted in Step 3:
+1. Check if it matches an existing canonical term or any of its variants
+2. If it's an obvious variant of an existing canonical (e.g., "attention mechanism" vs existing canonical "attention"), silently add it to that canonical's variant list
+3. If it's a new term with no close match, add it as a new canonical with an empty variant list
+4. If it's ambiguous, note it internally — do NOT ask about every ambiguous keyword. Instead, batch these and ask periodically (roughly every 5-10 ingest sessions, or when 3+ ambiguous terms have accumulated):
+   > "I've been using these terms separately — should any be merged? [list terms]"
+
+Write the updated `keywords.yml`.
+
+### Step 5 — Update index
+
+Read `journal-mirror/index.md`. Update:
+1. Add newly ingested pages to the journal's page range
+2. Recalculate gaps (missing page numbers within the range)
+3. Update the `Last ingest` date
+4. Update `## Incomplete Pages` — add pages marked `page_complete: false`, remove pages that were re-ingested as complete
+5. Check `## Monthly Checklist`:
+   - If any month that should have been captured by now is missing (based on the dates of entries ingested), flag it
+   - Mark months as captured when their monthly entry exists
+
+Write the updated `index.md`.
+
+### Step 6 — Regenerate rollups
+
+Identify all topics that were touched in this ingest session. For each:
+1. Read all entries tagged with that topic (or related keywords via alias map)
+2. Generate a consolidated rollup at `journal-mirror/rollups/TOPIC.md`
+3. Include: key concepts, open questions, related topics, entry count, and page references
+
+This overwrites any existing rollup for that topic.
+
+### Step 7 — Report
+
+Print a summary to the user:
+
+```
+## Ingest complete
+
+**Pages processed:** Bear #1 p.22-24 (3 pages)
+**Entries created:** 5 (attention-mechanisms, daily-todos, daily-reflection, wedding-venues, study-sparse-attention)
+**Entries updated:** 1 (daily-todos on p.22 — 1 new bullet)
+**Rollups refreshed:** attention-mechanisms, wedding
+**Keywords added:** sparse-attention (new), venue (→ wedding alias)
+
+### Gaps detected
+- Bear #1 p.14-15 not yet captured
+
+### Incomplete pages
+- Bear #1 p.24 (writing continues to next page)
+
+### Monthly check
+- February's monthly page hasn't been ingested yet — want to send it?
+```
+
+Omit sections that have no content (e.g., skip "Gaps detected" if there are no gaps).
