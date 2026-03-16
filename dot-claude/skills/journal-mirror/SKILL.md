@@ -351,3 +351,202 @@ Print a summary to the user:
 ```
 
 Omit sections that have no content (e.g., skip "Gaps detected" if there are no gaps).
+
+## Search workflow
+
+Triggered by `$ARGUMENTS` starting with `search`.
+
+### Step 1 — Parse query
+
+Extract the search intent from `$ARGUMENTS` after `search`. Support:
+- **Keyword search:** `search transformers` — match against entry keywords, resolving through `keywords.yml` aliases
+- **Filtered search:** `search topic:wedding date:2026-03` — filter by topic and/or date range
+- **Natural language:** `search When did I last go to Tivoli?` — interpret intent, search across both daily and monthly entries
+
+Read `journal-mirror/keywords.yml` to resolve any keyword aliases to their canonical form.
+
+If the query is ambiguous, ask for clarification rather than guessing:
+> "Did you mean [interpretation A] or [interpretation B]?"
+
+### Step 2 — Search entries
+
+Use Glob to find entry files in `journal-mirror/entries/`, then Grep or Read to match content.
+
+For keyword/filtered searches:
+1. Glob `journal-mirror/entries/*.md`
+2. Filter by frontmatter fields (topic, keywords, date) and body content
+3. Rank by relevance: exact keyword match > alias match > body text match
+
+For natural language searches:
+1. Identify the likely search targets (dates, events, topics, people)
+2. Search both `entries/` and monthly entries for matches
+3. For time-based questions ("when did I last..."), sort results by date descending
+
+### Step 3 — Present results
+
+Show matching entries as a concise list:
+
+```
+## Search results for "transformers"
+
+1. **2026-03-16 — Attention Mechanisms** (Bear #1 p.22)
+   Self-attention deep dive, connection to sparse attention research
+   Keywords: transformers, attention, self-attention
+
+2. **2026-03-10 — ML Study Notes** (Bear #1 p.15)
+   Transformer architecture overview, encoder-decoder structure
+   Keywords: transformers, encoder-decoder
+
+3 entries found across 2 topics.
+```
+
+If no results found, suggest related keywords from the alias map.
+
+## Synthesize workflow
+
+Triggered by `$ARGUMENTS` starting with `synthesize`.
+
+### Step 1 — Identify topic
+
+Extract the topic from `$ARGUMENTS` after `synthesize`. Resolve through `keywords.yml` to the canonical term. If no match found, search entries for close matches and suggest:
+> "I don't have a canonical keyword for '[term]'. Did you mean one of these? [list]"
+
+Check if the user requested timeline format (e.g., "synthesize transformers timeline" or "synthesize transformers as timeline"). Default is consolidated reference.
+
+### Step 2 — Gather entries
+
+1. Read `journal-mirror/keywords.yml` to get all aliases for the canonical term
+2. Glob `journal-mirror/entries/*.md`
+3. Collect all entries where the topic or any keyword matches the canonical term or its aliases
+4. Sort by date
+
+### Step 3 — Generate synthesis
+
+**Consolidated reference (default):**
+
+Write a distilled knowledge doc to `journal-mirror/syntheses/TOPIC.md`:
+
+```markdown
+# [Topic Name]
+
+*Synthesized: YYYY-MM-DD | N entries | [journal] p.X, Y, Z*
+
+## Overview
+(2-3 sentence summary of what these notes cover)
+
+## Key Concepts
+- Bullet points distilling the core knowledge
+
+## Decisions & Conclusions
+- Any decisions made or conclusions reached in the notes
+
+## Open Questions
+- Unresolved questions or areas to explore further
+
+## References
+- Any reference materials linked in entries
+
+## Source Entries
+- [date — topic](relative path to entry) — one-line summary
+```
+
+**Timeline narrative (on request):**
+
+Same file path, but structured chronologically:
+
+```markdown
+# [Topic Name] — Timeline
+
+*Synthesized: YYYY-MM-DD | N entries | [journal] p.X, Y, Z*
+
+## Timeline
+
+### YYYY-MM-DD (p.X)
+What was written and thought about on this date...
+
+### YYYY-MM-DD (p.Y)
+How thinking evolved, new connections made...
+
+## Evolution
+Brief narrative of how understanding changed over time.
+```
+
+### Step 4 — Report
+
+```
+Synthesis saved to journal-mirror/syntheses/[topic].md
+Based on N entries from [date range].
+```
+
+## Rollup workflow
+
+Triggered by `$ARGUMENTS` starting with `rollup`.
+
+This manually triggers a full rollup regeneration. (Rollups also regenerate automatically after each ingest session for touched topics.)
+
+### Step 1 — Gather all topics
+
+1. Glob `journal-mirror/entries/*.md`
+2. Read frontmatter to collect all unique canonical topics
+3. Resolve through `keywords.yml`
+
+### Step 2 — Regenerate all rollups
+
+For each canonical topic:
+1. Collect all entries tagged with that topic or its aliases
+2. Write/overwrite `journal-mirror/rollups/TOPIC.md` using the rollup format (see file formats section)
+
+### Step 3 — Report
+
+```
+## Rollup complete
+
+N rollups generated:
+- attention-mechanisms (8 entries)
+- wedding (5 entries)
+- daily-reflection (12 entries)
+...
+
+Rollups saved to journal-mirror/rollups/
+```
+
+## Status workflow
+
+Triggered by `$ARGUMENTS` starting with `status`.
+
+Read `journal-mirror/index.md`, `journal-mirror/keywords.yml`, and scan `journal-mirror/entries/` and `journal-mirror/syntheses/` to compile a status report.
+
+### Report format
+
+```
+## Journal Mirror Status
+
+### Journals
+- Bear #1: started 2026-03-16, pages 1-22 ingested (20 pages, 2 gaps)
+
+### Pages
+- Total pages ingested: 20
+- Gaps: Bear #1 p.14-15
+- Incomplete pages: Bear #1 p.22
+- Last ingest: 2026-03-20
+
+### Entries
+- Total entries: 35
+- Topics: 12 unique canonical topics
+- Most active: daily-reflection (12 entries), attention-mechanisms (8 entries)
+
+### Keywords
+- Canonical terms: 15
+- Total variants: 28
+- Recent additions: sparse-attention, venue
+
+### Syntheses
+- Up to date: 5
+- Stale (new entries since last synthesis): attention-mechanisms (2 new entries), wedding (1 new entry)
+
+### Monthly Checklist
+- [x] 2026-02
+- [ ] 2026-03 (not yet ingested)
+```
+
+Check for stale syntheses by comparing synthesis file modification dates against entry dates for each topic.
