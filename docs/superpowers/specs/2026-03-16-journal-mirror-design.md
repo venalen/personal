@@ -202,6 +202,8 @@ type: monthly
 
 ## Commands
 
+**Confidence-gated clarification:** Across all commands, if Claude's confidence in a transcription, segmentation, keyword extraction, or interpretation is low, it asks a clarifying question rather than guessing. This applies to handwriting ambiguity, topic boundaries, keyword categorization, and search intent.
+
 ### `ingest`
 
 Core workflow. Accepts one or more photos of journal pages.
@@ -230,7 +232,7 @@ When a previously ingested page is re-sent:
 6. Update `page_complete` flag on the raw file if applicable
 
 **Monthly prompts:**
-At the end of each month, Claude prompts Vicky to send the final version of that month's page. Tracked via a monthly checklist in `index.md`.
+At the end of each month, Claude prompts Vicky to send the final version of that month's page. Additionally, during any ingest session, Claude checks the monthly checklist in `index.md` for missed months — since photos can be batched and arrive out of order, a month-end-only check is insufficient. If a previous month's page hasn't been captured, Claude flags it (e.g., "February's monthly page hasn't been ingested yet — want to send it?").
 
 **Study session handling:**
 After ingesting study notes, Claude asks if there are reference materials used. Links are stored in the entry's `references` frontmatter field.
