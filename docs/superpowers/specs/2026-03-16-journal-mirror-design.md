@@ -17,7 +17,7 @@ description: >
   and generate topic rollups. Triggers on mentions of "journal," "mirror,"
   "bullet journal," "journal pages," "rollup," or requests to ingest,
   search, or synthesize journal notes.
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, AskUserQuestion
 argument-hint: "[ingest | search <query> | synthesize <topic> | rollup | status]"
 ```
 
