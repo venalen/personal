@@ -45,7 +45,9 @@ Journals are named by type and sequential number scoped to that type:
 - `Bear #2` — a future second Bear journal
 - `Moleskine #1` — a different journal type
 
-If only one journal of a type exists, the number can be omitted in conversation (e.g., "Bear p.42" implies Bear #1). File naming uses slugified form: `bear-1_p042.md`.
+If only one journal of a type exists, the number can be omitted in conversation (e.g., "Bear p.42" implies Bear #1).
+
+**File naming convention:** Journal names are slugified and page numbers are zero-padded to 3 digits throughout. Examples: `bear-1_p042.md`, `moleskine-1_p007.md`. This convention applies consistently to both `entries/` and `raw/` filenames.
 
 When starting a new journal, Vicky tells Claude and it increments the number and starts tracking pages from 1.
 
@@ -109,6 +111,8 @@ Red-highlighted content is preserved in raw transcriptions with a marker: `**[re
 
 ## File Formats
 
+All filenames use the slugified journal name and zero-padded 3-digit page numbers (e.g., `bear-1_p042`). Monthly entries follow a separate naming pattern noted below.
+
 ### Structured Entry (`entries/YYYY-MM-DD_JOURNAL_pSTART-END_TOPIC.md`)
 
 ```yaml
@@ -117,7 +121,6 @@ date: 2026-03-16
 journal: bear-1
 page_start: 22
 page_end: 22
-page_complete: true
 topic: attention-mechanisms
 keywords:
   - transformers
@@ -137,6 +140,12 @@ Notes on how self-attention works in transformer architectures...
 ```
 
 ### Raw Transcription (`raw/JOURNAL_pPAGE.md`)
+
+One file per physical page. Page number is zero-padded (e.g., `raw/bear-1_p022.md`).
+
+`page_complete` is authoritative on raw files only — structured entries do not carry this field since completeness is a property of the physical page, not the topic-chunk. During re-ingestion, only the raw file's `page_complete` flag is updated.
+
+`date_written` is derived from the date header on the page. If a page has entries spanning multiple dates, use the first date. If no date is visible, Claude asks.
 
 ```yaml
 ---
@@ -162,6 +171,8 @@ x review PR #432
 No segmentation, no summarization — verbatim transcription preserving bullet style and color annotations.
 
 ### Monthly Entry (`entries/YYYY-MM_JOURNAL_monthly.md`)
+
+Monthly entries use a different naming pattern from daily/study entries — no day, no topic slug, just the month and a `monthly` suffix. Monthly pages also get raw transcriptions: if the monthly spread covers pages 1-2, both `raw/bear-1_p001.md` and `raw/bear-1_p002.md` are created (one per physical page, same as daily).
 
 ```yaml
 ---
@@ -216,7 +227,7 @@ When a previously ingested page is re-sent:
 3. Overwrite raw file with updated transcription
 4. New topic-chunks → new entries; modified chunks → update existing entries
 5. Report changes: "Bear #1 p.22 re-ingested — 1 new bullet added to study notes, todo section unchanged"
-6. Update `page_complete` flag if applicable
+6. Update `page_complete` flag on the raw file if applicable
 
 **Monthly prompts:**
 At the end of each month, Claude prompts Vicky to send the final version of that month's page. Tracked via a monthly checklist in `index.md`.
