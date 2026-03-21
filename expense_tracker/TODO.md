@@ -1,7 +1,7 @@
 # Splitwise App — Enhancement Checklist
 
 ## 1. Passphrase Gate
-- [ ] Add passphrase screen to `App.tsx` (sessionStorage-backed, passphrase: "Dayton")
+- [ ] Add passphrase screen to `App.tsx` (sessionStorage-backed)
 - [ ] Add passphrase screen CSS styles
 
 ## 2. Rename App

@@ -4,7 +4,7 @@ import { fetchConfig } from './api';
 import UserSelector from './components/UserSelector';
 import Dashboard from './components/Dashboard';
 
-const PASSPHRASE_HASH = 'e30336717a46efe62c1ec54345bfa8e6f7d4cd1aba934e5dd9fa598b6b3fd41f';
+const PASSPHRASE_HASH = 'd5246d4c00948ec900b234a8ccf2aa4b6a7c9cd4493171065be257d29a432dfe';
 
 async function sha256(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);

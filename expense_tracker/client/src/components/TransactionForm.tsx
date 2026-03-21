@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { User } from '../types';
 import { createTransaction } from '../api';
 
@@ -20,6 +20,7 @@ export default function TransactionForm({ currentUser, onCreated, user1Name, use
   const [splitOffsetUser1, setSplitOffsetUser1] = useState('');
   const [splitOffsetUser2, setSplitOffsetUser2] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const descriptionRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setPaidBy(currentUser);
@@ -68,6 +69,7 @@ export default function TransactionForm({ currentUser, onCreated, user1Name, use
     setSplitOffsetUser1('');
     setSplitOffsetUser2('');
     setSubmitting(false);
+    descriptionRef.current?.focus();
     onCreated();
   }
 
@@ -82,6 +84,7 @@ export default function TransactionForm({ currentUser, onCreated, user1Name, use
         </div>
       </div>
       <input
+        ref={descriptionRef}
         type="text"
         placeholder="Description"
         value={description}
