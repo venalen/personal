@@ -87,7 +87,7 @@ export default function RecurringList({ currentUser, rules, onChanged, user1Name
                     : 'Offset'}
                 </span>
                 <span className="recurring-next-date">
-                  Next: {new Date(rule.next_occurrence).toLocaleDateString()}
+                  Next: {new Date(rule.next_occurrence.slice(0, 10) + 'T00:00:00').toLocaleDateString()}
                 </span>
               </div>
               <div className="recurring-item-actions">

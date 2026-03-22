@@ -154,7 +154,7 @@ export default function RecurringForm({ currentUser, onSaved, onCancel, user1Nam
       </div>
       {editingRule && (
         <div className="recurring-next">
-          Next occurrence: {new Date(editingRule.next_occurrence).toLocaleDateString()}
+          Next occurrence: {new Date(editingRule.next_occurrence.slice(0, 10) + 'T00:00:00').toLocaleDateString()}
         </div>
       )}
       <div className="split-mode-toggle">
