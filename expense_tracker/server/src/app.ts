@@ -4,6 +4,7 @@ import transactionsRouter from './routes/transactions';
 import paymentsRouter from './routes/payments';
 import balanceRouter from './routes/balance';
 import configRouter from './routes/config';
+import recurringRouter from './routes/recurring';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use('/api/transactions', transactionsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/balance', balanceRouter);
 app.use('/api/config', configRouter);
+app.use('/api/recurring', recurringRouter);
 
 // Serve static client files in production
 const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');

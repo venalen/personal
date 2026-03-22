@@ -1,7 +1,7 @@
 -- Seed data for local development
 -- Clears existing data and inserts sample transactions/payments across several months
 
-TRUNCATE transactions, payments RESTART IDENTITY;
+TRUNCATE recurring_rules, transactions, payments RESTART IDENTITY;
 
 -- January 2026
 INSERT INTO transactions (description, amount_cents, paid_by, split_user1_percent, split_mode, date, notes) VALUES
@@ -37,3 +37,11 @@ INSERT INTO transactions (description, amount_cents, paid_by, split_mode, split_
 -- One with non-50/50 percentage
 INSERT INTO transactions (description, amount_cents, paid_by, split_user1_percent, split_mode, date, notes) VALUES
   ('Gym membership',  8000, 'user2', 75, 'percentage', '2026-03-06', 'User1 goes more often');
+
+-- Recurring rule: Rent on the 1st of each month
+INSERT INTO recurring_rules (description, amount_cents, paid_by, split_user1_percent, split_mode, day_of_month, start_date, next_occurrence) VALUES
+  ('Rent', 200000, 'user1', 50, 'percentage', 1, '2026-01-01', '2026-04-01');
+
+-- March rent transaction generated from the recurring rule
+INSERT INTO transactions (description, amount_cents, paid_by, split_user1_percent, split_mode, date, recurring_rule_id) VALUES
+  ('Rent', 200000, 'user1', 50, 'percentage', '2026-03-01', 1);

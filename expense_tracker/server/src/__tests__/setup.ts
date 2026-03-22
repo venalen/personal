@@ -7,7 +7,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await pool.query('TRUNCATE transactions, payments RESTART IDENTITY CASCADE');
+  await pool.query('TRUNCATE recurring_rules, transactions, payments RESTART IDENTITY CASCADE');
 });
 
 afterAll(async () => {

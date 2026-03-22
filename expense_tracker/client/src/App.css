@@ -758,3 +758,232 @@ body::after {
   color: #666;
   user-select: none;
 }
+
+/* Recurring Section */
+.recurring-section {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.recurring-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.recurring-header h3 {
+  font-size: 1rem;
+}
+
+.add-recurring-btn {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  border: 1px solid #333;
+  background: #333;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-recurring-btn:hover {
+  background: #555;
+}
+
+.recurring-empty {
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+}
+
+.recurring-list {
+  list-style: none;
+}
+
+.recurring-item {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.recurring-item:last-child {
+  border-bottom: none;
+}
+
+.recurring-item.inactive {
+  opacity: 0.5;
+}
+
+.recurring-item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.recurring-desc {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.recurring-amount {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.recurring-item-details {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #888;
+  flex-wrap: wrap;
+}
+
+.recurring-next-date {
+  font-style: italic;
+}
+
+.recurring-item-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.recurring-action-btn {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.recurring-action-btn:hover {
+  background: #eee;
+}
+
+.recurring-action-btn.delete {
+  color: #c62828;
+  border-color: #c62828;
+}
+
+.recurring-action-btn.delete:hover {
+  background: #fef2f2;
+}
+
+/* Recurring Badge on Transactions */
+.recurring-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 9999px;
+  vertical-align: middle;
+}
+
+/* Recurring Form */
+.recurring-form {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.recurring-form h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.recurring-form input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.recurring-schedule {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.recurring-schedule label {
+  white-space: nowrap;
+}
+
+.recurring-schedule input {
+  width: 4rem;
+  text-align: center;
+}
+
+.recurring-hint {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
+
+.recurring-dates {
+  display: flex;
+  gap: 1rem;
+}
+
+.recurring-dates > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.recurring-dates label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.recurring-next {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.recurring-form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.recurring-form-actions button[type="submit"] {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border: none;
+  background: #333;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.recurring-form-actions button[type="submit"]:hover {
+  background: #555;
+}
+
+.recurring-form-actions button[type="submit"]:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.recurring-form-actions .cancel-btn {
+  padding: 0.5rem 1rem;
+}

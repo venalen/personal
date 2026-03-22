@@ -1,9 +1,12 @@
 import { Router, Request, Response } from 'express';
 import pool from '../db';
+import { validateOffsets, computeFinalPercent, computeSplitExtraToIfNeeded } from '../splits';
+import { generateDueRecurring } from '../recurring';
 
 const router = Router();
 
 router.get('/', async (_req: Request, res: Response) => {
+  await generateDueRecurring(pool);
   const result = await pool.query(
     'SELECT * FROM transactions ORDER BY date DESC, created_at DESC'
   );
@@ -14,39 +17,16 @@ router.post('/', async (req: Request, res: Response) => {
   const { description, notes, amount, date, paidBy, splitUser1Percent = 50, splitMode = 'percentage', splitOffsetUser1Cents = 0, splitOffsetUser2Cents = 0 } = req.body;
   const amountCents = Math.round(amount * 100);
 
-  // Server-side offset validation: offsets must be zero-sum and shares non-negative
   if (splitMode === 'offset') {
-    if (splitOffsetUser1Cents + splitOffsetUser2Cents !== 0) {
-      res.status(400).json({ error: 'Invalid offset: offsets must sum to zero' });
-      return;
-    }
-    const half = Math.round(amountCents / 2);
-    const u1Share = half + splitOffsetUser1Cents;
-    const u2Share = half + splitOffsetUser2Cents;
-    if (u1Share < 0 || u2Share < 0) {
-      res.status(400).json({ error: 'Invalid offset: shares exceed total or are negative' });
+    const error = validateOffsets(amountCents, splitOffsetUser1Cents, splitOffsetUser2Cents);
+    if (error) {
+      res.status(400).json({ error });
       return;
     }
   }
 
-  // When mode is offset, compute display percentage from offset
-  let finalPercent = splitUser1Percent;
-  if (splitMode === 'offset') {
-    const user1Share = Math.round(amountCents / 2) + splitOffsetUser1Cents;
-    finalPercent = Math.round((user1Share / amountCents) * 100);
-  }
-
-  let splitExtraTo: string | null = null;
-  if (splitMode === 'percentage' && finalPercent === 50 && amountCents % 2 !== 0) {
-    const countResult = await pool.query(
-      "SELECT split_extra_to, COUNT(*) as cnt FROM transactions WHERE split_extra_to IS NOT NULL GROUP BY split_extra_to"
-    );
-    const counts: Record<string, number> = { user1: 0, user2: 0 };
-    for (const row of countResult.rows) {
-      counts[row.split_extra_to] = parseInt(row.cnt);
-    }
-    splitExtraTo = counts.user1 <= counts.user2 ? 'user1' : 'user2';
-  }
+  const finalPercent = computeFinalPercent(amountCents, splitMode, splitUser1Percent, splitOffsetUser1Cents);
+  const splitExtraTo = await computeSplitExtraToIfNeeded(pool, amountCents, splitMode, finalPercent);
 
   const result = await pool.query(
     `INSERT INTO transactions (description, notes, amount_cents, paid_by, split_extra_to, split_user1_percent, split_mode, split_offset_user1_cents, split_offset_user2_cents, date)
@@ -61,39 +41,16 @@ router.put('/:id', async (req: Request, res: Response) => {
   const { description, notes, amount, date, paidBy, splitUser1Percent = 50, splitMode = 'percentage', splitOffsetUser1Cents = 0, splitOffsetUser2Cents = 0 } = req.body;
   const amountCents = Math.round(amount * 100);
 
-  // Server-side offset validation: offsets must be zero-sum and shares non-negative
   if (splitMode === 'offset') {
-    if (splitOffsetUser1Cents + splitOffsetUser2Cents !== 0) {
-      res.status(400).json({ error: 'Invalid offset: offsets must sum to zero' });
-      return;
-    }
-    const half = Math.round(amountCents / 2);
-    const u1Share = half + splitOffsetUser1Cents;
-    const u2Share = half + splitOffsetUser2Cents;
-    if (u1Share < 0 || u2Share < 0) {
-      res.status(400).json({ error: 'Invalid offset: shares exceed total or are negative' });
+    const error = validateOffsets(amountCents, splitOffsetUser1Cents, splitOffsetUser2Cents);
+    if (error) {
+      res.status(400).json({ error });
       return;
     }
   }
 
-  let finalPercent = splitUser1Percent;
-  if (splitMode === 'offset') {
-    const user1Share = Math.round(amountCents / 2) + splitOffsetUser1Cents;
-    finalPercent = Math.round((user1Share / amountCents) * 100);
-  }
-
-  let splitExtraTo: string | null = null;
-  if (splitMode === 'percentage' && finalPercent === 50 && amountCents % 2 !== 0) {
-    const countResult = await pool.query(
-      "SELECT split_extra_to, COUNT(*) as cnt FROM transactions WHERE split_extra_to IS NOT NULL AND id != $1 GROUP BY split_extra_to",
-      [req.params.id]
-    );
-    const counts: Record<string, number> = { user1: 0, user2: 0 };
-    for (const row of countResult.rows) {
-      counts[row.split_extra_to] = parseInt(row.cnt);
-    }
-    splitExtraTo = counts.user1 <= counts.user2 ? 'user1' : 'user2';
-  }
+  const finalPercent = computeFinalPercent(amountCents, splitMode, splitUser1Percent, splitOffsetUser1Cents);
+  const splitExtraTo = await computeSplitExtraToIfNeeded(pool, amountCents, splitMode, finalPercent, parseInt(req.params.id));
 
   const result = await pool.query(
     `UPDATE transactions

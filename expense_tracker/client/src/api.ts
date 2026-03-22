@@ -1,4 +1,4 @@
-import { Transaction, Payment, Balance } from './types';
+import { Transaction, Payment, Balance, RecurringRule } from './types';
 
 const BASE = '/api';
 
@@ -91,5 +91,66 @@ export async function deletePayment(id: number): Promise<void> {
 
 export async function fetchBalance(): Promise<Balance> {
   const res = await fetch(`${BASE}/balance`);
+  return res.json();
+}
+
+export async function fetchRecurring(): Promise<RecurringRule[]> {
+  const res = await fetch(`${BASE}/recurring`);
+  return res.json();
+}
+
+export async function createRecurring(data: {
+  description: string;
+  notes: string;
+  amount: number;
+  paidBy: string;
+  splitUser1Percent?: number;
+  splitMode?: 'percentage' | 'offset';
+  splitOffsetUser1Cents?: number;
+  splitOffsetUser2Cents?: number;
+  dayOfMonth: number;
+  startDate: string;
+  endDate?: string;
+}): Promise<RecurringRule> {
+  const res = await fetch(`${BASE}/recurring`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function updateRecurring(id: number, data: {
+  description: string;
+  notes: string;
+  amount: number;
+  paidBy: string;
+  splitUser1Percent?: number;
+  splitMode?: 'percentage' | 'offset';
+  splitOffsetUser1Cents?: number;
+  splitOffsetUser2Cents?: number;
+  dayOfMonth: number;
+  startDate: string;
+  endDate?: string;
+}): Promise<RecurringRule> {
+  const res = await fetch(`${BASE}/recurring/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function deleteRecurring(id: number): Promise<void> {
+  await fetch(`${BASE}/recurring/${id}`, { method: 'DELETE' });
+}
+
+export async function activateRecurring(id: number): Promise<RecurringRule> {
+  const res = await fetch(`${BASE}/recurring/${id}/activate`, { method: 'PUT' });
+  return res.json();
+}
+
+export async function deactivateRecurring(id: number): Promise<RecurringRule> {
+  const res = await fetch(`${BASE}/recurring/${id}/deactivate`, { method: 'PUT' });
   return res.json();
 }

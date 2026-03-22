@@ -316,6 +316,7 @@ export default function TransactionList({
                 <div className="item-main">
                   <div className="item-description">
                     <strong>{t.description}</strong>
+                    {t.recurring_rule_id && <span className="recurring-badge">recurring</span>}
                     {t.notes && <span className="notes"> — {t.notes}</span>}
                   </div>
                   <div className="item-details">

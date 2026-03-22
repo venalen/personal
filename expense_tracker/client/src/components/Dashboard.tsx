@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Fuse from 'fuse.js';
-import { User, Transaction, Payment, Balance } from '../types';
-import { fetchTransactions, fetchPayments, fetchBalance } from '../api';
+import { User, Transaction, Payment, Balance, RecurringRule } from '../types';
+import { fetchTransactions, fetchPayments, fetchBalance, fetchRecurring } from '../api';
 import BalanceSummary from './BalanceSummary';
 import TransactionForm from './TransactionForm';
 import PaymentForm from './PaymentForm';
 import TransactionList from './TransactionList';
+import RecurringList from './RecurringList';
 
 interface Props {
   currentUser: User;
@@ -28,6 +29,7 @@ export default function Dashboard({ currentUser, onSwitchUser, user1Name, user2N
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [balance, setBalance] = useState<Balance | null>(null);
+  const [recurringRules, setRecurringRules] = useState<RecurringRule[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -94,14 +96,16 @@ export default function Dashboard({ currentUser, onSwitchUser, user1Name, user2N
   const isSearching = searchQuery.trim().length > 0;
 
   const loadData = useCallback(async () => {
-    const [txs, pays, bal] = await Promise.all([
+    const [txs, pays, bal, rules] = await Promise.all([
       fetchTransactions(),
       fetchPayments(),
       fetchBalance(),
+      fetchRecurring(),
     ]);
     setTransactions(txs);
     setPayments(pays);
     setBalance(bal);
+    setRecurringRules(rules);
   }, []);
 
   useEffect(() => {
@@ -122,6 +126,13 @@ export default function Dashboard({ currentUser, onSwitchUser, user1Name, user2N
         <TransactionForm currentUser={currentUser} onCreated={loadData} user1Name={user1Name} user2Name={user2Name} />
         <PaymentForm currentUser={currentUser} onCreated={loadData} user1Name={user1Name} user2Name={user2Name} />
       </div>
+      <RecurringList
+        currentUser={currentUser}
+        rules={recurringRules}
+        onChanged={loadData}
+        user1Name={user1Name}
+        user2Name={user2Name}
+      />
       <div className="history-panel">
         <input
           type="text"
